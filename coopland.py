@@ -6,16 +6,10 @@ import os
 from dotenv import load_dotenv
 from time import sleep
 import textwrap
+from utils import download_picture, generate_post_text
 load_dotenv()
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6066.0 Safari/537.36'}
-
-def download_picture(link_photo,path):
-    response = requests.get(link_photo,verify=False, headers=headers)
-    response.raise_for_status()
-
-    with open(path, "wb") as file:
-        file.write(response.content)
 
 picture_folder_path = "./photos"
 
@@ -53,17 +47,10 @@ while True:
 
     photo_link = (f'https://coop-land.ru{relative_photo_link}')
     path_to_photo = Path(picture_folder_path, f"{picture_name}.png")
-    download_picture(photo_link,path_to_photo)
+    download_picture(photo_link,path_to_photo, headers)
+    
+    text = generate_post_text(header, description, news_link)
 
-
-    text = f'''
-    {header}
-
-    {description}
-
-    Ссылка на источник: {news_link}
-
-    '''
     text = textwrap.dedent(text)
     if last_posted_news != text:
         send_pictures(token, chat_id, text,[path_to_photo])

@@ -6,28 +6,13 @@ import os
 from dotenv import load_dotenv
 from time import sleep
 import textwrap
+from utils import download_picture, generate_post_text
 load_dotenv()
-
-
 
 
 URL = 'https://www.igromania.ru/news/'
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6066.0 Safari/537.36'}
-
-
-
-
-
-headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 YaBrowser/20.12.1.178 Yowser/2.5 Safari/537.36'}
-
-def download_picture_igromania(link_photo,path):
-    response = requests.get(link_photo,verify=False, headers=headers)
-    response.raise_for_status()
-
-    with open(path, "wb") as file:
-        file.write(response.content)
-
 
 chat_id = os.getenv('CHAT_ID')
 token = os.getenv('TOKEN')
@@ -68,17 +53,11 @@ while True:
 
     
     path_to_photo = Path(picture_folder_path, f"{picture_name_igromania}.png")
-    download_picture_igromania(photo_link,path_to_photo)
+    download_picture(photo_link,path_to_photo, headers)
 
 
-    text = f'''
-    {post_header}
+    text = generate_post_text(header, description, news_link)
 
-    {description}
-
-    Ссылка на источник: {news_linker}
-
-    '''
     text = textwrap.dedent(text)
     if last_posted_news != text:
         send_pictures(token, chat_id, text,[path_to_photo])
