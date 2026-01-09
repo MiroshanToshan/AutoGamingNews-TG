@@ -1,14 +1,17 @@
+from pathlib import Path
+import os
+import argparse
+import textwrap
+from time import sleep
+
 import requests
 from bs4 import BeautifulSoup
-from pathlib import Path
-from tg import *
-import os
 from dotenv import load_dotenv
-from time import sleep
-import textwrap
-from utils import download_picture, generate_post_text
-load_dotenv()
 
+from tg import *
+from utils import download_picture, generate_post_text
+from config import picture_name_igromania
+load_dotenv()
 
 URL = 'https://www.igromania.ru/news/'
 
@@ -21,7 +24,13 @@ picture_folder_path = "./photos"
 
 os.makedirs(picture_folder_path, exist_ok=True)
 
-picture_name_igromania = "photo_igromania"
+
+parser = argparse.ArgumentParser(
+        description='This program automatically collects and sends information to Telegram channels. The data is collected from the websites Igromania and Coopland.'
+)
+parser.add_argument('-p','--picture_name', help='Picture name without extension', default=picture_name_igromania)
+picture_name_igromania = parser.parse_args().picture_name
+
 
 url = 'https://www.igromania.ru/news/'
 while True:

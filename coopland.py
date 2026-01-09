@@ -1,12 +1,16 @@
+from pathlib import Path
+import os
+import argparse
+import textwrap
+from time import sleep
+
 import requests
 from bs4 import BeautifulSoup
-from pathlib import Path
-from tg import *
-import os
 from dotenv import load_dotenv
-from time import sleep
-import textwrap
+
+from tg import *
 from utils import download_picture, generate_post_text
+from config import picture_name_coopland
 load_dotenv()
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6066.0 Safari/537.36'}
@@ -15,11 +19,17 @@ picture_folder_path = "./photos"
 
 os.makedirs(picture_folder_path, exist_ok=True)
 
+
+parser = argparse.ArgumentParser(
+        description='This program automatically collects and sends information to Telegram channels. The data is collected from the websites Igromania and Coopland.'
+)
+parser.add_argument('-p','--picture_name', help='Picture name without extension', default=picture_name_coopland)
+picture_name_coopland = parser.parse_args().picture_name
+
+
 chat_id = os.getenv('CHAT_ID')
 token = os.getenv('TOKEN')
 
-
-picture_name = "photo_coopland"
 
 url = 'https://coop-land.ru/helpguides/new/'
 while True:
@@ -46,7 +56,7 @@ while True:
 
 
     photo_link = (f'https://coop-land.ru{relative_photo_link}')
-    path_to_photo = Path(picture_folder_path, f"{picture_name}.png")
+    path_to_photo = Path(picture_folder_path, f"{picture_name_coopland}.png")
     download_picture(photo_link,path_to_photo, headers)
     
     text = generate_post_text(header, description, news_link)
